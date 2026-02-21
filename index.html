@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">CLTExplica – Seus direitos, sem complicação.</title>
+<meta name="description" id="page-meta-desc" content="Portal informativo sobre direitos e rotina do trabalhador CLT no Brasil.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay" class="hidden">
+  <div class="login-card">
+    <div class="login-logo"><img src="/img/logo.png" alt="CLTExplica"></div>
+    <h2>Área Administrativa</h2>
+    <p>Acesso exclusivo para o administrador do CLTExplica</p>
+    <div class="login-field"><label>E-mail</label><input type="email" id="login-email" placeholder="admin@seusite.com" autocomplete="email"></div>
+    <div class="login-field"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()"></div>
+    <button class="login-btn" onclick="doLogin()"><span id="login-btn-text">Entrar no Dashboard</span></button>
+    <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
+    <div class="login-badge">🔒 Acesso restrito — CLTExplica Admin</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== SITE PÚBLICO ===== -->
+<div id="public-ui">
+
+  <div class="topbar">
+    <div class="container">
+      <span>📋 Portal de Informação para Trabalhadores CLT — <strong>Conteúdo educativo e gratuito</strong></span>
+      <div class="topbar-links">
+        <a href="#" onclick="showPage('about')">Sobre</a>
+        <a href="#" onclick="showPage('contact')">Contato</a>
+        <a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a>
+        <a href="#" onclick="openLoginOverlay()" style="color:rgba(255,255,255,.3);font-size:11px;">⚙️</a>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <div class="logo-wrap">
+          <a href="#" onclick="showPage('home')"><img src="/img/logo.png" alt="CLTExplica" style="height:56px;"></a>
+          <span class="logo-tagline">Seus direitos, sem complicação.</span>
+        </div>
+        <nav>
+          <a href="#" onclick="showPage('home');scrollToSection('categorias')">Categorias</a>
+          <a href="#" onclick="showPage('home');scrollToSection('artigos')">Artigos</a>
+          <a href="#" onclick="showPage('ferramentas')">Calculadoras</a>
+          <a href="#" onclick="showPage('about')">Sobre</a>
+          <a href="#" onclick="showPage('contact')" class="nav-cta">Fale Conosco</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <div id="home-page" class="page-section active">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-badge">⚖️ Informação trabalhista gratuita</div>
+          <h1>CLTExplica: seus direitos como trabalhador, <span>sem enrolação</span></h1>
+          <p>Entenda suas escalas, salário, FGTS, benefícios, demissão e muito mais — com linguagem simples e ferramentas gratuitas.</p>
+          <div class="hero-actions">
+            <a href="#" class="btn-primary" onclick="scrollToSection('categorias')">📂 Explorar categorias</a>
+            <a href="#" class="btn-outline-white" onclick="showPage('ferramentas')">🧮 Usar calculadoras</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="notice-bar">
+      <div class="container">
+        <span>⚠️</span>
+        <span><strong>Aviso:</strong> Este site é informativo e educacional. As informações não substituem a orientação de um advogado trabalhista. <a href="#" onclick="showPage('aviso-legal')">Saiba mais</a></span>
+      </div>
+    </div>
+
+    <div class="search-section">
+      <div class="search-wrap">
+        <h2>🔍 O que você quer saber hoje?</h2>
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Ex: como calcular hora extra, FGTS, escala 6x1..." onkeydown="if(event.key==='Enter') doSearch()">
+          <button onclick="doSearch()">🔍</button>
+        </div>
+        <div class="search-tags">
+          <span class="search-tag" onclick="quickSearch('hora extra')">Hora extra</span>
+          <span class="search-tag" onclick="quickSearch('aviso prévio')">Aviso prévio</span>
+          <span class="search-tag" onclick="quickSearch('13 salário')">13º salário</span>
+          <span class="search-tag" onclick="quickSearch('FGTS')">FGTS</span>
+          <span class="search-tag" onclick="quickSearch('férias')">Férias</span>
+          <span class="search-tag" onclick="quickSearch('escala 6x1')">Escala 6x1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container"><div class="ad-placeholder ad-banner" id="ad-banner-top">📢 Espaço para anúncio</div></div>
+
+    <section id="categorias">
+      <div class="container">
+        <div class="section-header"><div><div class="section-label">Explore por tema</div><h2>Categorias de conteúdo</h2></div></div>
+        <div class="categories-grid" id="categories-grid"><div class="loading-placeholder">Carregando categorias...</div></div>
+      </div>
+    </section>
+
+    <section id="artigos" style="background:var(--gray-light);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <div class="container">
+        <div class="section-header"><div><div class="section-label">Conteúdo recente</div><h2>Artigos mais recentes</h2></div></div>
+        <div class="articles-grid" id="articles-grid"><div class="loading-placeholder">Carregando artigos...</div></div>
+      </div>
+    </section>
+
+    <section class="tools-section">
+      <div class="container">
+        <div class="section-header"><div><div class="section-label">Ferramentas gratuitas</div><h2>Calculadoras CLT</h2></div></div>
+        <div class="tools-grid">
+          <a href="#" class="tool-card" onclick="showPage('ferramentas');return false;">
+            <div class="tool-icon">⏱️</div><h3>Calculadora de Horas Extras</h3>
+            <p>Descubra exatamente quanto você deve receber pelas horas trabalhadas a mais.</p>
+            <span class="btn-tool">Calcular agora →</span>
+          </a>
+          <a href="#" class="tool-card" onclick="showPage('ferramentas');return false;">
+            <div class="tool-icon">📋</div><h3>Calculadora de Rescisão CLT</h3>
+            <p>Simule suas verbas rescisórias em caso de demissão sem justa causa ou pedido de demissão.</p>
+            <span class="btn-tool">Calcular agora →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="lead-section">
+      <div class="container">
+        <div class="lead-inner">
+          <div class="lead-text">
+            <h2>Receba conteúdo trabalhista direto no seu e-mail</h2>
+            <p>Artigos semanais sobre seus direitos CLT, novidades trabalhistas e acesso antecipado às nossas calculadoras.</p>
+          </div>
+          <div class="lead-form">
+            <input type="text" id="lead-name" placeholder="Seu nome">
+            <input type="email" id="lead-email" placeholder="Seu melhor e-mail">
+            <button onclick="submitLead()">📩 Quero receber conteúdo</button>
+            <div class="lead-privacy">🔒 Seus dados estão seguros. Sem spam.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end home-page -->
+
+  <!-- ARTIGO -->
+  <div id="article-page" class="page-section">
+    <div class="article-header">
+      <div class="container">
+        <div class="article-breadcrumb"><a href="#" onclick="showPage('home')">Início</a> › <span id="article-category-breadcrumb">Categoria</span></div>
+        <h1 id="article-title">Carregando...</h1>
+        <div class="article-header-meta"><span id="article-date">📅</span><span id="article-read-time">⏱️</span></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="ad-placeholder ad-banner">📢 Espaço para anúncio</div>
+      <div class="article-layout">
+        <div class="article-content" id="article-content"></div>
+        <aside class="article-sidebar">
+          <div class="ad-placeholder ad-square">📢 Anúncio 300×250</div>
+          <div class="sidebar-box" style="margin-top:20px;"><h4>📚 Artigos relacionados</h4><ul id="related-articles"></ul></div>
+          <div class="cta-box"><h4>Ficou com dúvidas?</h4><p>Para seu caso específico, consulte um especialista.</p><a href="#" class="btn-cta-white" onclick="showPage('contact')">Fale conosco</a></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- FERRAMENTAS -->
+  <div id="ferramentas-page" class="page-section">
+    <div class="article-header"><div class="container"><div class="article-breadcrumb"><a href="#" onclick="showPage('home')">Início</a> › Ferramentas</div><h1>Calculadoras CLT Gratuitas</h1></div></div>
+    <section style="padding:48px 0;">
+      <div class="container">
+        <div style="background:var(--yellow-light);border:1px solid var(--yellow);border-radius:var(--radius);padding:12px 18px;margin-bottom:28px;font-size:14px;color:#5a4500;">ℹ️ Os cálculos são estimativas. Consulte um profissional para seu caso.</div>
+        <div class="calc-container">
+          <div class="calc-box">
+            <h3>⏱️ Calculadora de Horas Extras</h3><p class="subtitle">Descubra quanto você deve receber.</p>
+            <div class="form-group"><label>Salário mensal bruto (R$)</label><input type="number" id="he-salario" placeholder="Ex: 2000"></div>
+            <div class="form-group"><label>Horas trabalhadas por dia</label><input type="number" id="he-horas-dia" placeholder="Ex: 8"></div>
+            <div class="form-group"><label>Dias trabalhados por semana</label><input type="number" id="he-dias-semana" placeholder="Ex: 6"></div>
+            <div class="form-group"><label>Tipo de hora extra</label>
+              <select id="he-tipo"><option value="50">50% — Dias úteis</option><option value="100">100% — Domingos/feriados</option></select>
+            </div>
+            <button class="btn-calc" onclick="calcHoraExtra()">Calcular hora extra</button>
+            <div class="calc-result" id="he-result">
+              <div class="calc-result-label">Valor da hora extra</div><div class="calc-result-value" id="he-valor-hora"></div>
+              <div class="calc-result-label" style="margin-top:12px;">Total extras no mês</div><div class="calc-result-value" id="he-total-mes"></div>
+              <div class="calc-result-note" id="he-note"></div>
+            </div>
+          </div>
+          <div class="calc-box">
+            <h3>📋 Calculadora de Rescisão CLT</h3><p class="subtitle">Estime as verbas rescisórias.</p>
+            <div class="form-group"><label>Salário mensal bruto (R$)</label><input type="number" id="res-salario" placeholder="Ex: 3000"></div>
+            <div class="form-group"><label>Tempo de serviço (meses)</label><input type="number" id="res-meses" placeholder="Ex: 24"></div>
+            <div class="form-group"><label>Mês de demissão</label>
+              <select id="res-mes"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select>
+            </div>
+            <div class="form-group"><label>Tipo de demissão</label>
+              <select id="res-tipo"><option value="sem-justa">Sem justa causa</option><option value="pedido">Pedido de demissão</option></select>
+            </div>
+            <button class="btn-calc" onclick="calcRescisao()">Calcular rescisão</button>
+            <div class="calc-result" id="res-result">
+              <div class="calc-result-label">Total estimado</div><div class="calc-result-value" id="res-total"></div>
+              <div style="margin-top:14px;font-size:13px;color:var(--gray);">
+                <div>📌 Saldo: <strong id="res-saldo"></strong></div>
+                <div>📌 Aviso prévio: <strong id="res-aviso"></strong></div>
+                <div>📌 Férias + ⅓: <strong id="res-ferias"></strong></div>
+                <div>📌 13º proporcional: <strong id="res-decimo"></strong></div>
+                <div>📌 FGTS + Multa 40%: <strong id="res-fgts"></strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SOBRE -->
+  <div id="about-page" class="page-section">
+    <div class="about-hero"><div class="container"><h1>Sobre o CLTExplica</h1><p style="font-size:18px;color:var(--gray);max-width:620px;">Portal independente criado para ajudar trabalhadores brasileiros a entender seus direitos CLT.</p></div></div>
+    <section><div class="container"><div style="max-width:720px;margin:0 auto;">
+      <h2 style="font-family:var(--font-head);font-size:24px;font-weight:800;margin-bottom:14px;">Nossa missão</h2>
+      <p style="color:var(--gray);font-size:16px;line-height:1.7;">Traduzir a complexidade da legislação trabalhista em informação prática, clara e gratuita para todo trabalhador CLT.</p>
+      <div style="background:var(--yellow-light);border-left:4px solid var(--yellow);padding:18px 20px;border-radius:0 var(--radius) var(--radius) 0;margin:28px 0;">⚠️ O CLTExplica <strong>não é um escritório de advocacia</strong>. Para dúvidas específicas, consulte um advogado trabalhista.</div>
+    </div></div></section>
+  </div>
+
+  <!-- CONTATO -->
+  <div id="contact-page" class="page-section">
+    <div class="article-header"><div class="container"><h1>Fale com o CLTExplica</h1></div></div>
+    <section><div class="container"><div class="contact-grid">
+      <div class="contact-info">
+        <h2>Entre em contato</h2>
+        <p style="color:var(--gray);margin-bottom:24px;">Tem uma dúvida, quer sugerir um tema ou propor uma parceria?</p>
+        <div class="contact-item"><div class="contact-item-icon">📧</div><div><h4>E-mail</h4><p>contato@cltexplica.com.br</p></div></div>
+      </div>
+      <div class="contact-form-box">
+        <h3>✉️ Envie sua mensagem</h3>
+        <div class="form-group"><label>Seu nome</label><input type="text" id="contact-name" placeholder="Maria da Silva"></div>
+        <div class="form-group"><label>E-mail</label><input type="email" id="contact-email" placeholder="seu@email.com"></div>
+        <div class="form-group"><label>Mensagem</label><textarea id="contact-message" style="resize:vertical;min-height:120px;" placeholder="Sua mensagem..."></textarea></div>
+        <button class="btn-calc" onclick="showToast('Mensagem enviada! ✉️','success')">Enviar mensagem</button>
+      </div>
+    </div></div></section>
+  </div>
+
+  <!-- AVISO LEGAL -->
+  <div id="aviso-legal-page" class="page-section">
+    <section><div class="container"><div class="legal-content">
+      <h1>Aviso Legal</h1><p class="last-updated">Última atualização: 2025</p>
+      <div class="legal-notice-box"><div style="font-size:28px;">⚠️</div><div><h3>Este site NÃO é um site do governo</h3><p>O CLTExplica é um portal privado e independente, sem vínculo com o Governo Federal ou Ministério do Trabalho.</p></div></div>
+      <h2>Natureza do conteúdo</h2><p>Todo conteúdo tem caráter exclusivamente informativo e educacional. Não constitui consultoria jurídica.</p>
+    </div></div></section>
+  </div>
+
+  <!-- PRIVACIDADE -->
+  <div id="privacy-page" class="page-section">
+    <section><div class="container"><div class="legal-content">
+      <h1>Política de Privacidade</h1><p class="last-updated">Última atualização: 2025</p>
+      <h2>Coleta de dados</h2><p>Coletamos apenas dados fornecidos voluntariamente e dados de navegação via cookies.</p>
+      <h2>Seus direitos (LGPD)</h2><p>Solicite acesso, correção ou exclusão: privacidade@cltexplica.com.br</p>
+    </div></div></section>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="/img/logo.png" alt="CLTExplica" style="height:42px;filter:brightness(0) invert(1);margin-bottom:12px;">
+          <p>Portal informativo e educacional sobre direitos trabalhistas para trabalhadores CLT.</p>
+          <div style="margin-top:16px;"><span style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:12px;padding:5px 12px;border-radius:100px;">⚠️ Site informativo — não é site do governo</span></div>
+        </div>
+        <div class="footer-col">
+          <h4>Categorias</h4>
+          <ul><li><a href="#">Escalas de Trabalho</a></li><li><a href="#">Salário e Adicionais</a></li><li><a href="#">FGTS e Benefícios</a></li><li><a href="#">Demissão e Rescisão</a></li></ul>
+        </div>
+        <div class="footer-col">
+          <h4>Ferramentas</h4>
+          <ul><li><a href="#" onclick="showPage('ferramentas')">Calc. Horas Extras</a></li><li><a href="#" onclick="showPage('ferramentas')">Calc. Rescisão CLT</a></li></ul>
+          <h4 style="margin-top:20px;">Institucional</h4>
+          <ul><li><a href="#" onclick="showPage('about')">Sobre</a></li><li><a href="#" onclick="showPage('contact')">Contato</a></li><li><a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a></li></ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul><li><a href="#" onclick="showPage('privacy')">Política de Privacidade</a></li><li><a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a></li></ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 CLTExplica. Todos os direitos reservados.</span>
+        <span><a href="#" onclick="showPage('privacy')">Privacidade</a> · <a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a></span>
+      </div>
+    </div>
+  </footer>
+</div><!-- end public-ui -->
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard-page" style="display:none;min-height:100vh;background:var(--gray-light);">
+  <div class="dash-header">
+    <div class="dash-header-inner">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="/img/logo.png" alt="CLTExplica" style="height:36px;filter:brightness(0) invert(1);">
+        <div class="dash-title">Dashboard Administrativo</div>
+      </div>
+      <div class="dash-actions">
+        <span class="dash-user">👤 <span id="dash-user-email"></span></span>
+        <button class="dash-view-site" onclick="exitDashboard()">🌐 Ver Site</button>
+        <button class="dash-logout" onclick="doLogout()">Sair</button>
+      </div>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="dash-sidebar">
+      <div class="dash-nav-group" style="margin-top:8px;">
+        <div class="dash-nav-label">Geral</div>
+        <div class="dash-nav-item active" onclick="switchPanel('overview')"><span class="nav-icon">📊</span> Visão Geral</div>
+      </div>
+      <div class="dash-nav-group">
+        <div class="dash-nav-label">Conteúdo</div>
+        <div class="dash-nav-item" onclick="switchPanel('new-post')"><span class="nav-icon">✏️</span> Novo Artigo</div>
+        <div class="dash-nav-item" onclick="switchPanel('posts')"><span class="nav-icon">📄</span> Todos os Artigos</div>
+        <div class="dash-nav-item" onclick="switchPanel('leads')"><span class="nav-icon">📧</span> Leads / E-mails</div>
+      </div>
+      <div class="dash-nav-group">
+        <div class="dash-nav-label">Monetização</div>
+        <div class="dash-nav-item" onclick="switchPanel('ads')"><span class="nav-icon">📢</span> Anúncios</div>
+      </div>
+      <div class="dash-nav-group">
+        <div class="dash-nav-label">Configurações</div>
+        <div class="dash-nav-item" onclick="switchPanel('seo')"><span class="nav-icon">🔍</span> SEO & Config.</div>
+      </div>
+    </div>
+    <div class="dash-content">
+
+      <!-- OVERVIEW -->
+      <div class="dash-panel active" id="panel-overview">
+        <div class="dash-page-title">Visão Geral</div>
+        <div class="dash-page-subtitle">Bem-vindo ao painel do CLTExplica!</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Artigos publicados</div><div class="stat-value" id="stat-published">—</div></div>
+          <div class="stat-card"><div class="stat-label">Rascunhos</div><div class="stat-value" id="stat-drafts">—</div></div>
+          <div class="stat-card"><div class="stat-label">Leads capturados</div><div class="stat-value" id="stat-leads">—</div></div>
+          <div class="stat-card"><div class="stat-label">Categorias</div><div class="stat-value" id="stat-cats">—</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+          <div style="background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);padding:22px;">
+            <h4 style="font-family:var(--font-head);font-size:15px;font-weight:700;margin-bottom:16px;">⚡ Ações rápidas</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button onclick="switchPanel('new-post')" class="btn-calc" style="text-align:left;">✏️ Escrever novo artigo</button>
+              <button onclick="switchPanel('posts')" style="background:var(--gray-light);color:var(--gray);font-family:var(--font-body);font-weight:600;font-size:14px;padding:11px 18px;border:1px solid var(--border);border-radius:7px;cursor:pointer;text-align:left;">📄 Gerenciar artigos</button>
+              <button onclick="switchPanel('ads')" style="background:var(--gray-light);color:var(--gray);font-family:var(--font-body);font-weight:600;font-size:14px;padding:11px 18px;border:1px solid var(--border);border-radius:7px;cursor:pointer;text-align:left;">📢 Gerenciar anúncios</button>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);padding:22px;">
+            <h4 style="font-family:var(--font-head);font-size:15px;font-weight:700;margin-bottom:16px;">📋 Artigos recentes</h4>
+            <div id="recent-posts-dash"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW POST -->
+      <div class="dash-panel" id="panel-new-post">
+        <div class="dash-page-title">✏️ <span id="editor-mode-label">Novo Artigo</span></div>
+        <div class="dash-page-subtitle">Escreva e publique conteúdo no CLTExplica</div>
+        <input type="hidden" id="editing-post-id">
+        <div class="editor-layout">
+          <div class="editor-main">
+            <div class="editor-toolbar">
+              <button class="toolbar-btn" onclick="insertTag('**','**')"><b>B</b></button>
+              <button class="toolbar-btn" onclick="insertTag('_','_')"><i>I</i></button>
+              <button class="toolbar-btn" onclick="insertTag('\n## ','')">H2</button>
+              <button class="toolbar-btn" onclick="insertTag('\n### ','')">H3</button>
+              <button class="toolbar-btn" onclick="insertTag('\n- ','')">Lista</button>
+              <button class="toolbar-btn" onclick="insertTag('[texto](','url)')">Link</button>
+              <button class="toolbar-btn" onclick="insertTag('\n> ','')">Quote</button>
+            </div>
+            <div class="editor-field-group"><label>Título do artigo</label><textarea class="editor-title-input" id="post-title" rows="2" placeholder="Ex: Como calcular hora extra: guia completo" oninput="autoSlug()"></textarea></div>
+            <div class="editor-field-group"><label>Conteúdo (Markdown suportado)</label><textarea class="editor-content-input" id="post-content" placeholder="## Introdução&#10;Explique o tema..."></textarea></div>
+            <div class="editor-field-group"><label>Resumo / Excerpt</label><textarea id="post-excerpt" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;outline:none;resize:vertical;min-height:60px;" placeholder="Breve descrição para listagens..."></textarea></div>
+            <div class="editor-field-group"><label>Meta description (SEO — máx. 160 caracteres)</label><input type="text" id="post-meta-desc" oninput="updateCharCount(this,'meta-count',160)" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;outline:none;"><div class="char-count" id="meta-count">0 / 160</div></div>
+          </div>
+          <div class="editor-sidebar">
+            <div class="editor-box">
+              <h4>📤 Publicar</h4>
+              <select class="editor-select" id="post-status"><option value="published">✅ Publicado</option><option value="draft" selected>📝 Rascunho</option></select>
+              <button class="btn-publish" onclick="savePost()">🚀 Salvar artigo</button>
+              <button class="btn-draft" onclick="document.getElementById('post-status').value='draft';savePost()">💾 Salvar rascunho</button>
+            </div>
+            <div class="editor-box">
+              <h4>🗂️ Categoria</h4>
+              <select class="editor-select" id="post-category"><option value="">Selecionar...</option></select>
+            </div>
+            <div class="editor-box">
+              <h4>🏷️ Tags</h4>
+              <div class="tag-input-wrap" onclick="document.getElementById('tag-input').focus()">
+                <div id="tags-chips"></div>
+                <input type="text" id="tag-input" style="border:none;outline:none;font-size:13px;min-width:80px;background:transparent;font-family:var(--font-body);" placeholder="Adicionar tag..." onkeydown="addTag(event)">
+              </div>
+              <div style="font-size:11px;color:var(--gray-mid);margin-top:6px;">Enter para adicionar</div>
+            </div>
+            <div class="editor-box">
+              <h4>🔗 URL amigável</h4>
+              <input type="text" class="editor-input-sm" id="post-slug" placeholder="ex: como-calcular-hora-extra" style="width:100%;">
+              <div style="font-size:11px;color:var(--gray-mid);margin-top:4px;">cltexplica.com.br/<span id="slug-preview" style="color:var(--blue);">...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POSTS LIST -->
+      <div class="dash-panel" id="panel-posts">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div class="dash-page-title">📄 Todos os Artigos</div>
+          <button onclick="switchPanel('new-post')" style="background:var(--blue);color:#fff;font-family:var(--font-body);font-weight:700;font-size:14px;padding:11px 20px;border:none;border-radius:7px;cursor:pointer;">+ Novo artigo</button>
+        </div>
+        <div class="posts-table">
+          <div class="posts-table-header"><div>Título</div><div>Categoria</div><div>Status</div><div>Data</div><div>Ações</div></div>
+          <div id="posts-list-body"><div style="padding:24px;text-align:center;color:var(--gray-mid);">Carregando...</div></div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div class="dash-panel" id="panel-leads">
+        <div class="dash-page-title">📧 Leads / E-mails capturados</div>
+        <div class="dash-page-subtitle">Lista de usuários cadastrados via newsletter</div>
+        <div class="posts-table">
+          <div class="posts-table-header" style="grid-template-columns:1fr 1fr 120px;"><div>Nome</div><div>E-mail</div><div>Data</div></div>
+          <div id="leads-list-body"><div style="padding:24px;text-align:center;color:var(--gray-mid);">Carregando...</div></div>
+        </div>
+      </div>
+
+      <!-- ADS PANEL -->
+      <div class="dash-panel" id="panel-ads">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:14px;">
+          <div>
+            <div class="dash-page-title">📢 Gerenciar Anúncios</div>
+            <div class="dash-page-subtitle">Crie anúncios numerados (ad01, ad02...) com imagem, link e código HTML</div>
+          </div>
+          <button onclick="openAdModal()" style="background:var(--blue);color:#fff;font-family:var(--font-body);font-weight:700;font-size:14px;padding:11px 20px;border:none;border-radius:7px;cursor:pointer;">+ Novo anúncio</button>
+        </div>
+        <div id="ads-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;"></div>
+        <div id="ads-empty" style="display:none;text-align:center;padding:56px 20px;background:#fff;border-radius:var(--radius-lg);border:2px dashed var(--border);">
+          <div style="font-size:48px;margin-bottom:14px;">📢</div>
+          <h3 style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:8px;">Nenhum anúncio cadastrado</h3>
+          <p style="font-size:14px;color:var(--gray-mid);margin-bottom:20px;">Crie seu primeiro anúncio clicando no botão acima.</p>
+          <button onclick="openAdModal()" style="background:var(--blue);color:#fff;font-family:var(--font-body);font-weight:700;font-size:14px;padding:11px 24px;border:none;border-radius:7px;cursor:pointer;">+ Criar primeiro anúncio</button>
+        </div>
+      </div>
+
+      <!-- SEO -->
+      <div class="dash-panel" id="panel-seo">
+        <div class="dash-page-title">🔍 SEO & Configurações</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px;">
+          <div class="settings-card">
+            <h4>SEO da página inicial</h4>
+            <div class="settings-field"><label>Meta title</label><input type="text" id="cfg-meta-title" placeholder="CLTExplica – Seus direitos..."></div>
+            <div class="settings-field"><label>Meta description</label><textarea id="cfg-meta-desc" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;outline:none;resize:vertical;min-height:80px;"></textarea></div>
+            <button class="btn-save-settings" onclick="saveSettings(['meta_title','meta_description'])">Salvar SEO</button>
+          </div>
+          <div class="settings-card">
+            <h4>Integrações</h4>
+            <div class="settings-field"><label>Google Analytics ID</label><input type="text" id="cfg-ga-id" placeholder="G-XXXXXXXXXX"></div>
+            <div class="settings-field"><label>E-mail de contato</label><input type="email" id="cfg-site-email" placeholder="contato@cltexplica.com.br"></div>
+            <button class="btn-save-settings" onclick="saveSettings(['google_analytics_id','site_email'])">Salvar integrações</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- end dashboard -->
+
+<!-- AD MODAL -->
+<div id="ad-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:var(--radius-lg);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);">
+    <div style="padding:24px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <h3 id="modal-ad-title" style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--gray-dark);">Novo anúncio</h3>
+      <button onclick="closeAdModal()" style="background:var(--gray-light);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <div style="padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+      <input type="hidden" id="modal-ad-db-id">
+      <!-- ID -->
+      <div class="form-group" style="margin:0;">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:6px;">ID do anúncio <span style="color:var(--gray-mid);font-weight:400;">(ex: ad01, banner-topo)</span></label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="text" id="modal-ad-id" placeholder="ad01" oninput="this.value=this.value.replace(/[^a-zA-Z0-9-_]/g,'').toLowerCase();document.getElementById('modal-ad-id-badge').textContent=this.value" style="flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:15px;font-weight:700;outline:none;">
+          <div id="modal-ad-id-badge" style="background:var(--blue-light);color:var(--blue);font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;font-family:monospace;white-space:nowrap;min-width:40px;text-align:center;"></div>
+        </div>
+      </div>
+      <!-- Nome -->
+      <div class="form-group" style="margin:0;">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:6px;">Nome do anúncio</label>
+        <input type="text" id="modal-ad-name" placeholder="Ex: Banner topo da home" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;outline:none;">
+      </div>
+      <!-- Posição -->
+      <div class="form-group" style="margin:0;">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:6px;">Posição no site</label>
+        <select id="modal-ad-position" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;outline:none;background:#fff;">
+          <option value="banner-topo">🔝 Banner topo (728×90)</option>
+          <option value="lateral-artigo">📰 Lateral artigo (300×250)</option>
+          <option value="meio-artigo">📄 Meio do artigo (728×90)</option>
+          <option value="rodape">🔻 Rodapé (728×90)</option>
+          <option value="personalizado">⚙️ Personalizado</option>
+        </select>
+      </div>
+      <!-- Tipo -->
+      <div class="form-group" style="margin:0;">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:8px;">Tipo de anúncio</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label id="type-img-label" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--blue);border-radius:var(--radius);cursor:pointer;">
+            <input type="radio" name="ad-type" value="image" checked onchange="switchAdType('image')" style="accent-color:var(--blue);">
+            <div><div style="font-size:13px;font-weight:700;color:var(--gray-dark);">🖼️ Imagem + Link</div><div style="font-size:11px;color:var(--gray-mid);">Upload de banner</div></div>
+          </label>
+          <label id="type-code-label" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;">
+            <input type="radio" name="ad-type" value="code" onchange="switchAdType('code')" style="accent-color:var(--blue);">
+            <div><div style="font-size:13px;font-weight:700;color:var(--gray-dark);">💻 Código HTML</div><div style="font-size:11px;color:var(--gray-mid);">AdSense / script</div></div>
+          </label>
+        </div>
+      </div>
+      <!-- Seção Imagem -->
+      <div id="section-image" style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:8px;">Imagem do anúncio</label>
+          <div id="img-upload-zone" onclick="document.getElementById('modal-ad-img-input').click()" style="border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;position:relative;transition:border-color .15s;">
+            <input type="file" id="modal-ad-img-input" accept="image/*" style="display:none;" onchange="handleAdImageUpload(event)">
+            <div id="img-upload-placeholder"><div style="font-size:32px;margin-bottom:8px;">🖼️</div><div style="font-size:14px;font-weight:600;color:var(--gray-mid);">Clique para selecionar imagem</div><div style="font-size:12px;color:var(--gray-mid);margin-top:4px;">JPG, PNG, WebP — máx. 2MB</div></div>
+            <img id="img-preview" src="" alt="" style="display:none;max-width:100%;max-height:160px;border-radius:6px;object-fit:contain;">
+            <button id="img-remove-btn" onclick="removeAdImage(event)" style="display:none;position:absolute;top:8px;right:8px;background:#fee2e2;border:none;color:#b91c1c;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">× Remover</button>
+          </div>
+          <div style="font-size:11px;color:var(--gray-mid);margin-top:6px;">Ou cole uma URL de imagem:</div>
+          <input type="text" id="modal-ad-img-url" placeholder="https://exemplo.com/banner.jpg" oninput="previewImageUrl(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:13px;outline:none;margin-top:6px;">
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:6px;">Link de destino (URL)</label>
+          <input type="url" id="modal-ad-link" placeholder="https://site-do-anunciante.com.br" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:6px;">Texto alternativo (acessibilidade)</label>
+          <input type="text" id="modal-ad-alt" placeholder="Ex: Anúncio Empresa XYZ" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;outline:none;">
+        </div>
+      </div>
+      <!-- Seção Código -->
+      <div id="section-code" style="display:none;">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:6px;">Código HTML do anúncio</label>
+        <textarea id="modal-ad-code" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;resize:vertical;min-height:120px;outline:none;" placeholder="<!-- Cole aqui o código do AdSense -->"></textarea>
+      </div>
+      <!-- Status -->
+      <div class="form-group" style="margin:0;">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--gray);margin-bottom:8px;">Status</label>
+        <div style="display:flex;gap:10px;">
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:600;color:var(--gray-dark);">
+            <input type="radio" name="ad-status" value="active" checked style="accent-color:var(--green);"> ✅ Ativo
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:600;color:var(--gray-dark);">
+            <input type="radio" name="ad-status" value="inactive" style="accent-color:var(--gray-mid);"> ⏸️ Pausado
+          </label>
+        </div>
+      </div>
+    </div>
+    <div style="padding:18px 26px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeAdModal()" style="background:var(--gray-light);color:var(--gray);font-family:var(--font-body);font-weight:600;font-size:14px;padding:11px 20px;border:1px solid var(--border);border-radius:7px;cursor:pointer;">Cancelar</button>
+      <button onclick="saveAd()" style="background:var(--green);color:#fff;font-family:var(--font-body);font-weight:700;font-size:14px;padding:11px 24px;border:none;border-radius:7px;cursor:pointer;">💾 Salvar anúncio</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/supabase-client.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
