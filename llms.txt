@@ -1,0 +1,22 @@
+# CLTExplica
+
+> Portal de informação gratuita sobre direitos trabalhistas CLT no Brasil.
+
+CLTExplica é um portal educativo e gratuito que ajuda trabalhadores brasileiros a entenderem seus direitos sob a Consolidação das Leis do Trabalho (CLT). O site oferece artigos explicativos em linguagem simples, calculadoras de direitos trabalhistas e guias práticos.
+
+## O que oferecemos
+
+- Artigos sobre escalas de trabalho (6x1, 5x2, 12x36 e outras)
+- Explicações sobre salário, horas extras e adicionais
+- Guias sobre FGTS, férias e 13º salário
+- Informações sobre demissão e rescisão de contrato
+- Calculadora de horas extras
+- Calculadora de rescisão trabalhista
+
+## Público-alvo
+
+Trabalhadores brasileiros com carteira assinada (CLT) que buscam informação clara e gratuita sobre seus direitos.
+
+## Contato
+
+Site: https://cltexplica.com.br
