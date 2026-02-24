@@ -1,4 +1,6 @@
-// CLTExplica — app.js v3 (limpo, sem SUPABASE_OK)
+':'')
+  setTimeout(()=>t.className='toast',3500)
+}// CLTExplica — app.js v3 (limpo, sem SUPABASE_OK)
 
 let currentUser = null
 let postTags = []
@@ -11,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await checkSession()
   await loadPublicData()
   checkCalcGate()
+  initRouter()
   const modal = document.getElementById('ad-modal')
   if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeAdModal() })
 })
@@ -63,16 +66,56 @@ async function doLogout() {
 }
 
 // NAVEGAÇÃO
-function showPage(page) {
+const PAGE_MAP = {
+  home: { id: 'home-page', url: '/' },
+  article: { id: 'article-page', url: null },
+  ferramentas: { id: 'ferramentas-page', url: '/ferramentas' },
+  about: { id: 'about-page', url: '/sobre' },
+  contact: { id: 'contact-page', url: '/contato' },
+  'aviso-legal': { id: 'aviso-legal-page', url: '/aviso-legal' },
+  privacy: { id: 'privacy-page', url: '/privacidade' }
+}
+
+function showPage(page, pushState = true) {
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
-  const map = {
-    home:'home-page', article:'article-page', ferramentas:'ferramentas-page',
-    about:'about-page', contact:'contact-page', 'aviso-legal':'aviso-legal-page', privacy:'privacy-page'
-  }
-  const el = document.getElementById(map[page] || 'home-page')
+  const entry = PAGE_MAP[page] || PAGE_MAP['home']
+  const el = document.getElementById(entry.id)
   if (el) el.classList.add('active')
+  if (pushState && entry.url) {
+    history.pushState({ page }, '', entry.url)
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' })
   return false
+}
+
+// Lidar com botão voltar/avançar do navegador
+window.addEventListener('popstate', (e) => {
+  const page = e.state?.page || routeFromPath(location.pathname)
+  showPage(page, false)
+})
+
+// Detectar rota ao carregar a página
+function routeFromPath(path) {
+  const routes = {
+    '/': 'home',
+    '/ferramentas': 'ferramentas',
+    '/sobre': 'about',
+    '/contato': 'contact',
+    '/aviso-legal': 'aviso-legal',
+    '/privacidade': 'privacy'
+  }
+  // Rota de artigo: /artigo/slug
+  if (path.startsWith('/artigo/')) {
+    const slug = path.replace('/artigo/', '')
+    openArticle(slug)
+    return 'article'
+  }
+  return routes[path] || 'home'
+}
+
+function initRouter() {
+  const page = routeFromPath(location.pathname)
+  showPage(page, false)
 }
 
 function scrollToSection(id) {
@@ -145,7 +188,10 @@ async function openArticle(slug) {
     document.getElementById('article-read-time').textContent = '⏱️ ~'+readTime(data.content)+' min de leitura'
     document.getElementById('article-content').innerHTML = renderMarkdown(data.content||'')
     loadRelatedArticles(data.category, data.id)
-    showPage('article')
+    history.pushState({ page: 'article', slug }, '', `/artigo/${slug}`)
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
+    document.getElementById('article-page').classList.add('active')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   } catch(e) {}
 }
 
