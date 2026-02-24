@@ -12,6 +12,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Roteamento inline — roda antes do DOM carregar
+(function() {
+  const routes = {
+    '/': 'home-page',
+    '/ferramentas': 'ferramentas-page',
+    '/sobre': 'about-page',
+    '/contato': 'contact-page',
+    '/aviso-legal': 'aviso-legal-page',
+    '/privacidade': 'privacy-page'
+  }
+  const path = location.pathname
+  const targetId = path.startsWith('/artigo/') ? 'article-page' : (routes[path] || 'home-page')
+  // Aguarda o DOM e ativa a página correta
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
+    const el = document.getElementById(targetId)
+    if (el) el.classList.add('active')
+  }, { once: true })
+})()
+</script>
 </head>
 <body>
 
