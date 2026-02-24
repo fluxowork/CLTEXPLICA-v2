@@ -95,18 +95,13 @@ window.addEventListener('popstate', (e) => {
 })
 
 function initRouter() {
+  // Roteamento já tratado pelo script inline no <head>
+  // Aqui só tratamos artigos que precisam buscar dados
   const path = location.pathname
   if (path.startsWith('/artigo/')) {
     const slug = path.replace('/artigo/', '')
     openArticle(slug)
-    return
   }
-  const page = pageFromPath(path)
-  // Ativar a página correta sem modificar a URL
-  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
-  const entry = PAGE_MAP[page] || PAGE_MAP['home']
-  const el = document.getElementById(entry.id)
-  if (el) el.classList.add('active')
 }
 
 function scrollToSection(id) {
