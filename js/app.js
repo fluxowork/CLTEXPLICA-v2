@@ -8,10 +8,10 @@ let editingAdDbId = null
 
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {
+  initRouter() // Roda primeiro para mostrar a página correta imediatamente
   await checkSession()
   await loadPublicData()
   checkCalcGate()
-  initRouter()
   const modal = document.getElementById('ad-modal')
   if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeAdModal() })
 })
