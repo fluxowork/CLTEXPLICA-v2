@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2592759981116801"
-     crossorigin="anonymous"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="page-title">CLTExplica – Seus direitos, sem complicação.</title>
@@ -186,6 +184,21 @@
     <section style="padding:48px 0;">
       <div class="container">
         <div style="background:var(--yellow-light);border:1px solid var(--yellow);border-radius:var(--radius);padding:12px 18px;margin-bottom:28px;font-size:14px;color:#5a4500;">ℹ️ Os cálculos são estimativas. Consulte um profissional para seu caso.</div>
+
+        <!-- GATE DE E-MAIL -->
+        <div id="calc-gate" style="background:#fff;border:2px solid var(--blue);border-radius:var(--radius);padding:32px;text-align:center;max-width:480px;margin:0 auto 40px;">
+          <div style="font-size:48px;margin-bottom:12px;">🧮</div>
+          <h3 style="font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:8px;">Acesso gratuito às calculadoras</h3>
+          <p style="color:var(--gray-mid);font-size:14px;margin-bottom:20px;">Informe seu e-mail para usar todas as calculadoras CLT gratuitamente.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <input type="email" id="gate-email" placeholder="Seu melhor e-mail" style="flex:1;min-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;">
+            <button onclick="unlockCalcs()" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:12px 20px;font-weight:700;font-size:14px;cursor:pointer;">Acessar grátis →</button>
+          </div>
+          <p style="font-size:12px;color:var(--gray-mid);margin-top:12px;">🔒 Sem spam. Seus dados estão seguros.</p>
+        </div>
+
+        <!-- CALCULADORAS (bloqueadas até informar e-mail) -->
+        <div id="calc-content" style="display:none;">
         <div class="calc-container">
           <div class="calc-box">
             <h3>⏱️ Calculadora de Horas Extras</h3><p class="subtitle">Descubra quanto você deve receber.</p>
@@ -224,7 +237,36 @@
               </div>
             </div>
           </div>
+
+          <!-- CALCULADORA DE FÉRIAS -->
+          <div class="calc-box">
+            <h3>🏖️ Calculadora de Férias CLT</h3><p class="subtitle">Saiba quanto você vai receber nas férias.</p>
+            <div class="form-group"><label>Salário mensal bruto (R$)</label><input type="number" id="fer-salario" placeholder="Ex: 3000"></div>
+            <div class="form-group"><label>Dias de férias a receber</label>
+              <select id="fer-dias">
+                <option value="30">30 dias (integral)</option>
+                <option value="20">20 dias (vendeu 10)</option>
+                <option value="15">15 dias (vendeu 15)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Dias vendidos (abono pecuniário)</label><input type="number" id="fer-abono" placeholder="Ex: 0" value="0" min="0" max="10"></div>
+            <div class="form-group"><label>Mês de início das férias</label>
+              <select id="fer-mes"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select>
+            </div>
+            <button class="btn-calc" onclick="calcFerias()">Calcular férias</button>
+            <div class="calc-result" id="fer-result">
+              <div class="calc-result-label">Total a receber nas férias</div><div class="calc-result-value" id="fer-total"></div>
+              <div style="margin-top:14px;font-size:13px;color:var(--gray);">
+                <div>📌 Férias (<span id="fer-dias-label"></span> dias): <strong id="fer-valor-ferias"></strong></div>
+                <div>📌 ⅓ constitucional: <strong id="fer-terco"></strong></div>
+                <div>📌 Abono pecuniário: <strong id="fer-abono-valor"></strong></div>
+                <div style="margin-top:8px;font-size:12px;color:var(--gray-mid);" id="fer-note"></div>
+              </div>
+            </div>
+          </div>
+
         </div>
+        </div><!-- fim calc-content -->
       </div>
     </section>
   </div>
