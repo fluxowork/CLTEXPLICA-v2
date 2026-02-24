@@ -1,6 +1,4 @@
-':'')
-  setTimeout(()=>t.className='toast',3500)
-}// CLTExplica — app.js v3 (limpo, sem SUPABASE_OK)
+// CLTExplica — app.js v3 (limpo, sem SUPABASE_OK)
 
 let currentUser = null
 let postTags = []
@@ -67,13 +65,13 @@ async function doLogout() {
 
 // NAVEGAÇÃO
 const PAGE_MAP = {
-  home: { id: 'home-page', url: '/' },
-  article: { id: 'article-page', url: null },
+  home:        { id: 'home-page',        url: '/' },
+  article:     { id: 'article-page',     url: null },
   ferramentas: { id: 'ferramentas-page', url: '/ferramentas' },
-  about: { id: 'about-page', url: '/sobre' },
-  contact: { id: 'contact-page', url: '/contato' },
-  'aviso-legal': { id: 'aviso-legal-page', url: '/aviso-legal' },
-  privacy: { id: 'privacy-page', url: '/privacidade' }
+  about:       { id: 'about-page',       url: '/sobre' },
+  contact:     { id: 'contact-page',     url: '/contato' },
+  'aviso-legal':{ id: 'aviso-legal-page',url: '/aviso-legal' },
+  privacy:     { id: 'privacy-page',     url: '/privacidade' }
 }
 
 function showPage(page, pushState = true) {
@@ -81,41 +79,34 @@ function showPage(page, pushState = true) {
   const entry = PAGE_MAP[page] || PAGE_MAP['home']
   const el = document.getElementById(entry.id)
   if (el) el.classList.add('active')
-  if (pushState && entry.url) {
-    history.pushState({ page }, '', entry.url)
-  }
+  if (pushState && entry.url) history.pushState({ page }, '', entry.url)
   window.scrollTo({ top: 0, behavior: 'smooth' })
   return false
 }
 
-// Lidar com botão voltar/avançar do navegador
-window.addEventListener('popstate', (e) => {
-  const page = e.state?.page || routeFromPath(location.pathname)
-  showPage(page, false)
-})
-
-// Detectar rota ao carregar a página
-function routeFromPath(path) {
-  const routes = {
-    '/': 'home',
-    '/ferramentas': 'ferramentas',
-    '/sobre': 'about',
-    '/contato': 'contact',
-    '/aviso-legal': 'aviso-legal',
-    '/privacidade': 'privacy'
-  }
-  // Rota de artigo: /artigo/slug
-  if (path.startsWith('/artigo/')) {
-    const slug = path.replace('/artigo/', '')
-    openArticle(slug)
-    return 'article'
-  }
+function pageFromPath(path) {
+  const routes = { '/':'home', '/ferramentas':'ferramentas', '/sobre':'about', '/contato':'contact', '/aviso-legal':'aviso-legal', '/privacidade':'privacy' }
   return routes[path] || 'home'
 }
 
-function initRouter() {
-  const page = routeFromPath(location.pathname)
+window.addEventListener('popstate', (e) => {
+  const page = e.state?.page || pageFromPath(location.pathname)
   showPage(page, false)
+})
+
+function initRouter() {
+  const path = location.pathname
+  if (path.startsWith('/artigo/')) {
+    const slug = path.replace('/artigo/', '')
+    openArticle(slug)
+    return
+  }
+  const page = pageFromPath(path)
+  // Ativar a página correta sem modificar a URL
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
+  const entry = PAGE_MAP[page] || PAGE_MAP['home']
+  const el = document.getElementById(entry.id)
+  if (el) el.classList.add('active')
 }
 
 function scrollToSection(id) {
