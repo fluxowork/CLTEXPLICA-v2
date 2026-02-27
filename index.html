@@ -20,10 +20,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="stylesheet" href="/css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Roteamento inline — roda antes do DOM carregar
+// Roteamento via CSS — sem conflito com DOMContentLoaded
 (function() {
   const routes = {
-    '/': 'home-page',
     '/ferramentas': 'ferramentas-page',
     '/sobre': 'about-page',
     '/contato': 'contact-page',
@@ -31,13 +30,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     '/privacidade': 'privacy-page'
   }
   const path = location.pathname
-  const targetId = path.startsWith('/artigo/') ? 'article-page' : (routes[path] || 'home-page')
-  // Aguarda o DOM e ativa a página correta
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
-    const el = document.getElementById(targetId)
-    if (el) el.classList.add('active')
-  }, { once: true })
+  const targetId = path.startsWith('/artigo/') ? 'article-page' : routes[path]
+  if (!targetId) return // na home, não faz nada — active já está no HTML
+  // Injeta CSS: esconde home, mostra a página correta
+  const s = document.createElement('style')
+  s.id = 'route-style'
+  s.textContent = '#home-page{display:none!important}#' + targetId + '{display:block!important}'
+  document.head.appendChild(s)
 })()
      <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZMCQ05Z3L"></script>
@@ -106,7 +105,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </header>
 <meta name="5125a261b02b96cff6603676916af525a723cae2" content="5125a261b02b96cff6603676916af525a723cae2" />
   <!-- HOME -->
-  <div id="home-page" class="page-section">
+  <div id="home-page" class="page-section active">
     <section class="hero">
       <div class="container">
         <div class="hero-content">
@@ -335,7 +334,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="contact-info">
         <h2>Entre em contato</h2>
         <p style="color:var(--gray);margin-bottom:24px;">Tem uma dúvida, quer sugerir um tema ou propor uma parceria?</p>
-        <div class="contact-item"><div class="contact-item-icon">📧</div><div><h4>E-mail</h4><p>contato@cltexplica.com.br</p></div></div>
+        <div class="contact-item"><div class="contact-item-icon">📧</div><div><h4>E-mail</h4><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec8f8382988d9883ac8f809889949c80858f8dc28f8381c28e9e">[email&#160;protected]</a></p></div></div>
       </div>
       <div class="contact-form-box">
         <h3>✉️ Envie sua mensagem</h3>
@@ -361,7 +360,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section><div class="container"><div class="legal-content">
       <h1>Política de Privacidade</h1><p class="last-updated">Última atualização: 2025</p>
       <h2>Coleta de dados</h2><p>Coletamos apenas dados fornecidos voluntariamente e dados de navegação via cookies.</p>
-      <h2>Seus direitos (LGPD)</h2><p>Solicite acesso, correção ou exclusão: privacidade@cltexplica.com.br</p>
+      <h2>Seus direitos (LGPD)</h2><p>Solicite acesso, correção ou exclusão: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cabab8a3bcaba9a3aeabaeaf8aa9a6beafb2baa6a3a9abe4a9a5a7e4a8b8">[email&#160;protected]</a></p>
     </div></div></section>
   </div>
 
@@ -661,12 +660,4 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div style="padding:18px 26px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;">
       <button onclick="closeAdModal()" style="background:var(--gray-light);color:var(--gray);font-family:var(--font-body);font-weight:600;font-size:14px;padding:11px 20px;border:1px solid var(--border);border-radius:7px;cursor:pointer;">Cancelar</button>
-      <button onclick="saveAd()" style="background:var(--green);color:#fff;font-family:var(--font-body);font-weight:700;font-size:14px;padding:11px 24px;border:none;border-radius:7px;cursor:pointer;">💾 Salvar anúncio</button>
-    </div>
-  </div>
-</div>
-
-<script src="/js/supabase-client.js"></script>
-<script src="/js/app.js"></script>
-</body>
-</html>
+      <button onclick="saveAd()" style="background:var(--green);color:#fff;font-family:var(--fon
