@@ -95,13 +95,14 @@ window.addEventListener('popstate', (e) => {
 })
 
 function initRouter() {
-  // Roteamento já tratado pelo script inline no <head>
-  // Aqui só tratamos artigos que precisam buscar dados
   const path = location.pathname
+  if (path === '/' || path === '') return // home já tem active no HTML
   if (path.startsWith('/artigo/')) {
-    const slug = path.replace('/artigo/', '')
-    openArticle(slug)
+    openArticle(path.replace('/artigo/', ''))
+    return
   }
+  const page = pageFromPath(path)
+  showPage(page, false) // false = não mexe na URL
 }
 
 function scrollToSection(id) {
@@ -726,4 +727,3 @@ function showToast(msg, type='neutral') {
   t.className='toast show'+(type==='success'?' success':type==='error'?' error':'')
   setTimeout(()=>t.className='toast',3500)
 }
-https://flusteredexam.com/bY3.Vx0pP/3kpXvEb-mhVrJnZ/D/0T2/ONDaI-4EOTDrMcz/LlTMYE4UMPjIgM4/MGzwcS
