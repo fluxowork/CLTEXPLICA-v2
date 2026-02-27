@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await checkSession()
   await loadPublicData()
   checkCalcGate()
-  initRouter() // Roda DEPOIS dos dados carregarem
   const modal = document.getElementById('ad-modal')
   if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeAdModal() })
+  initRouter() // SEMPRE por último — após dados carregados
 })
 
 // AUTH
@@ -96,13 +96,15 @@ window.addEventListener('popstate', (e) => {
 
 function initRouter() {
   const path = location.pathname
-  if (path === '/' || path === '') return // home já tem active no HTML
+  if (path === '/' || path === '') return
   if (path.startsWith('/artigo/')) {
     openArticle(path.replace('/artigo/', ''))
     return
   }
-  const page = pageFromPath(path)
-  showPage(page, false) // false = não mexe na URL
+  const pageName = pageFromPath(path)
+  if (pageName && pageName !== 'home') {
+    showPage(pageName, false)
+  }
 }
 
 function scrollToSection(id) {
@@ -113,7 +115,7 @@ function scrollToSection(id) {
 }
 
 // DADOS PÚBLICOS
-async async function loadPublicData() {
+async function loadPublicData() {
   await Promise.all([loadCategories(), loadPublicArticles()])
 }
 
