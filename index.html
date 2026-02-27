@@ -19,27 +19,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-// Roteamento via CSS — sem conflito com DOMContentLoaded
-(function() {
-  const routes = {
-    '/ferramentas': 'ferramentas-page',
-    '/sobre': 'about-page',
-    '/contato': 'contact-page',
-    '/aviso-legal': 'aviso-legal-page',
-    '/privacidade': 'privacy-page'
-  }
-  const path = location.pathname
-  const targetId = path.startsWith('/artigo/') ? 'article-page' : routes[path]
-  if (!targetId) return // na home, não faz nada — active já está no HTML
-  // Injeta CSS: esconde home, mostra a página correta
-  const s = document.createElement('style')
-  s.id = 'route-style'
-  s.textContent = '#home-page{display:none!important}#' + targetId + '{display:block!important}'
-  document.head.appendChild(s)
-})()
-     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZMCQ05Z3L"></script>
+
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
