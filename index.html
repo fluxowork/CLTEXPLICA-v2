@@ -58,8 +58,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container">
       <span>📋 Portal de Informação para Trabalhadores CLT — <strong>Conteúdo educativo e gratuito</strong></span>
       <div class="topbar-links">
-        <a href="#" onclick="showPage('about')">Sobre</a>
-        <a href="#" onclick="showPage('contact')">Contato</a>
+        <a href="#" href="/sobre" onclick="showPage('about');return false;">Sobre</a>
+        <a href="#" href="/contato" onclick="showPage('contact');return false;">Contato</a>
         <a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a>
         <a href="#" onclick="openLoginOverlay()" style="color:rgba(255,255,255,.3);font-size:11px;">⚙️</a>
       </div>
@@ -76,8 +76,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <nav>
           <a href="#" onclick="showPage('home');scrollToSection('categorias')">Categorias</a>
           <a href="#" onclick="showPage('home');scrollToSection('artigos')">Artigos</a>
-          <a href="#" onclick="showPage('ferramentas')">Calculadoras</a>
-          <a href="#" onclick="showPage('about')">Sobre</a>
+          <a href="#" href="/ferramentas" onclick="showPage('ferramentas');return false;">Calculadoras</a>
+          <a href="#" href="/sobre" onclick="showPage('about');return false;">Sobre</a>
           <a href="#" onclick="showPage('contact')" class="nav-cta">Fale Conosco</a>
         </nav>
       </div>
@@ -94,7 +94,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <p>Entenda suas escalas, salário, FGTS, benefícios, demissão e muito mais — com linguagem simples e ferramentas gratuitas.</p>
           <div class="hero-actions">
             <a href="#" class="btn-primary" onclick="scrollToSection('categorias')">📂 Explorar categorias</a>
-            <a href="#" class="btn-outline-white" onclick="showPage('ferramentas')">🧮 Usar calculadoras</a>
+            <a href="#" class="btn-outline-white" href="/ferramentas" onclick="showPage('ferramentas');return false;">🧮 Usar calculadoras</a>
           </div>
         </div>
       </div>
@@ -198,7 +198,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <aside class="article-sidebar">
           <div class="ad-placeholder ad-square">📢 Anúncio 300×250</div>
           <div class="sidebar-box" style="margin-top:20px;"><h4>📚 Artigos relacionados</h4><ul id="related-articles"></ul></div>
-          <div class="cta-box"><h4>Ficou com dúvidas?</h4><p>Para seu caso específico, consulte um especialista.</p><a href="#" class="btn-cta-white" onclick="showPage('contact')">Fale conosco</a></div>
+          <div class="cta-box"><h4>Ficou com dúvidas?</h4><p>Para seu caso específico, consulte um especialista.</p><a href="#" class="btn-cta-white" href="/contato" onclick="showPage('contact');return false;">Fale conosco</a></div>
         </aside>
       </div>
     </div>
@@ -360,7 +360,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <h4>Ferramentas</h4>
           <ul><li><a href="#" onclick="showPage('ferramentas')">Calc. Horas Extras</a></li><li><a href="#" onclick="showPage('ferramentas')">Calc. Rescisão CLT</a></li><li><a href="#" onclick="showPage('ferramentas')">Calc. Férias CLT</a></li></ul>
           <h4 style="margin-top:20px;">Institucional</h4>
-          <ul><li><a href="#" onclick="showPage('about')">Sobre</a></li><li><a href="#" onclick="showPage('contact')">Contato</a></li><li><a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a></li></ul>
+          <ul><li><a href="#" href="/sobre" onclick="showPage('about');return false;">Sobre</a></li><li><a href="#" href="/contato" onclick="showPage('contact');return false;">Contato</a></li><li><a href="#" onclick="showPage('aviso-legal')">Aviso Legal</a></li></ul>
         </div>
         <div class="footer-col">
           <h4>Legal</h4>
