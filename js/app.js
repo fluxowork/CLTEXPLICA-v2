@@ -123,21 +123,27 @@ async function loadPublicData() {
 // ============================================
 async function loadPublicAds() {
   try {
-    const { data } = await sb.from('ads')
+    const { data, error } = await sb.from('ads')
       .select('*')
       .eq('status', 'active')
-    if (!data || data.length === 0) return
+    if (error) { console.error('Erro ads:', error.message); return }
+    if (!data || data.length === 0) { console.log('Nenhum anúncio ativo'); return }
+    console.log('Anúncios carregados:', data.length)
     data.forEach(ad => renderAdInSlot(ad))
-  } catch(e) {}
+  } catch(e) { console.error('loadPublicAds exception:', e) }
 }
 
 function renderAdInSlot(ad) {
   const slots = document.querySelectorAll(`[data-ad-slot="${ad.position}"]`)
+  console.log(`Slot "${ad.position}": ${slots.length} encontrado(s)`)
   if (!slots.length) return
   const html = buildAdHtml(ad)
+  if (!html) { console.log('buildAdHtml retornou vazio para:', ad.ad_id); return }
   slots.forEach(slot => {
     slot.innerHTML = html
     slot.style.display = 'block'
+    slot.style.visibility = 'visible'
+    slot.style.minHeight = '60px'
   })
 }
 
