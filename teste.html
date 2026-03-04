@@ -3,100 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Diagnóstico CLTExplica</title>
+  <title>Diagnóstico Anúncios</title>
   <style>
     body { font-family: monospace; padding: 16px; background: #111; color: #0f0; font-size: 13px; }
-    .ok { color: #0f0; }
-    .erro { color: #f44; }
-    .info { color: #ff0; }
-    h2 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 8px; }
-    pre { background: #222; padding: 8px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+    .ok { color: #0f0; } .erro { color: #f44; } .info { color: #ff0; }
+    h2 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 8px; margin-top: 24px; }
   </style>
 </head>
 <body>
-<h2>🔍 Diagnóstico CLTExplica</h2>
+<h2>🔍 Diagnóstico Anúncios</h2>
 <div id="log"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
 <script>
 const log = document.getElementById('log')
-function out(msg, tipo = 'info') {
-  log.innerHTML += `<div class="${tipo}">${msg}</div>`
-}
+function out(msg, tipo='info') { log.innerHTML += `<div class="${tipo}">${msg}</div>` }
 
 async function diagnostico() {
-  // 1. URL atual
-  out(`📍 URL: ${location.pathname}`, 'info')
-  out(`📍 Host: ${location.host}`, 'info')
-
-  // 2. Verificar páginas no DOM (não existe nesse arquivo, mas testa o supabase)
-  out('<br><h2>Supabase</h2>', 'info')
-
-  // 3. Testar conexão Supabase
-  try {
-    out('Testando conexão...', 'info')
-    const { data, error } = await sb.from('posts')
-      .select('id, title, slug, status')
-      .limit(5)
-
-    if (error) {
-      out(`❌ Erro Supabase: ${JSON.stringify(error)}`, 'erro')
-    } else {
-      out(`✅ Supabase OK — ${data.length} post(s) encontrado(s)`, 'ok')
-      data.forEach(p => {
-        out(`   📄 [${p.status}] ${p.title?.substring(0,40)} (${p.slug})`, 'ok')
-      })
-    }
-  } catch(e) {
-    out(`❌ Exceção: ${e.message}`, 'erro')
+  // 1. Todos os anúncios
+  out('<h2>Todos os anúncios no banco</h2>')
+  const { data: todos, error: e1 } = await sb.from('ads').select('*')
+  if (e1) { out('❌ Erro: ' + e1.message, 'erro'); }
+  else if (!todos || todos.length === 0) { out('⚠️ Nenhum anúncio cadastrado ainda', 'erro') }
+  else {
+    out(`✅ ${todos.length} anúncio(s) no banco`, 'ok')
+    todos.forEach(ad => {
+      out(`   📢 ID: ${ad.ad_id} | Status: ${ad.status} | Posição: ${ad.position} | Tipo: ${ad.type}`, 
+          ad.status === 'active' ? 'ok' : 'info')
+    })
   }
 
-  // 4. Testar posts publicados
-  out('<br><h2>Posts publicados</h2>', 'info')
-  try {
-    const { data, error } = await sb.from('posts')
-      .select('id, title, status')
-      .eq('status', 'published')
-      .limit(10)
-
-    if (error) {
-      out(`❌ Erro: ${JSON.stringify(error)}`, 'erro')
-    } else if (!data || data.length === 0) {
-      out('⚠️ Nenhum post com status "published" encontrado!', 'erro')
-      out('Os posts estão como "draft" — precisam ser publicados no dashboard', 'info')
-    } else {
-      out(`✅ ${data.length} post(s) publicado(s)`, 'ok')
-      data.forEach(p => out(`   ✅ ${p.title?.substring(0,50)}`, 'ok'))
-    }
-  } catch(e) {
-    out(`❌ Exceção: ${e.message}`, 'erro')
+  // 2. Só ativos
+  out('<h2>Anúncios ativos (o que aparece no site)</h2>')
+  const { data: ativos, error: e2 } = await sb.from('ads').select('*').eq('status','active')
+  if (e2) { out('❌ Erro RLS: ' + e2.message, 'erro'); out('⚠️ Provavelmente falta policy de leitura pública na tabela ads', 'erro') }
+  else if (!ativos || ativos.length === 0) { out('⚠️ Nenhum anúncio com status "active"', 'erro') }
+  else {
+    out(`✅ ${ativos.length} anúncio(s) ativo(s)`, 'ok')
+    ativos.forEach(ad => {
+      const temConteudo = ad.image_base64 || ad.image_url || ad.html_code
+      out(`   ✅ ${ad.ad_id} → posição: ${ad.position} | tem conteúdo: ${temConteudo ? 'SIM' : 'NÃO'}`,
+          temConteudo ? 'ok' : 'erro')
+    })
   }
 
-  // 5. Testar categories
-  out('<br><h2>Categorias</h2>', 'info')
-  try {
-    const { data, error } = await sb.from('categories').select('*')
-    if (error) {
-      out(`❌ Erro: ${JSON.stringify(error)}`, 'erro')
-    } else {
-      out(`${data.length === 0 ? '⚠️' : '✅'} ${data.length} categoria(s) no banco`, data.length > 0 ? 'ok' : 'erro')
-    }
-  } catch(e) {
-    out(`❌ Exceção: ${e.message}`, 'erro')
-  }
+  // 3. Slots no DOM (não existe neste arquivo de teste, mas informa)
+  out('<h2>Slots no site</h2>')
+  out('Slots esperados: banner-topo, meio-artigo, rodape', 'info')
+  out('Para ver se aparecem, acesse a home e verifique após o deploy', 'info')
 
-  // 6. Testar leads (tabela para e-mails)
-  out('<br><h2>Tabela leads</h2>', 'info')
-  try {
-    const { data, error } = await sb.from('leads').select('id').limit(1)
-    if (error) out(`❌ Tabela leads: ${error.message}`, 'erro')
-    else out(`✅ Tabela leads existe`, 'ok')
-  } catch(e) {
-    out(`❌ Exceção: ${e.message}`, 'erro')
-  }
-
-  out('<br><div class="ok">✅ Diagnóstico concluído</div>', 'ok')
+  out('<br><div class="ok">✅ Diagnóstico concluído</div>')
 }
 
 diagnostico()
