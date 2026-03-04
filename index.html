@@ -28,12 +28,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   gtag('config', 'G-1ZMCQ05Z3L');
 </script>
 <style>
-  .ad-slot { display: none; width: 100%; }
+  .ad-slot { display: none; width: 100%; overflow: hidden; }
   .ad-slot-banner { max-width: 728px; margin: 16px auto; padding: 0 16px; }
   .ad-slot-meio { width: 100%; margin: 0; }
   .ad-slot-rodape { max-width: 728px; margin: 16px auto; padding: 0 16px; }
-  .ad-slot-inner { display: block; width: 100%; }
-  .ad-slot-inner img { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .ad-slot img { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .ad-slot a { display: block; width: 100%; }
   .ad-placeholder { display: none !important; }
 </style>
 </head>
@@ -133,7 +133,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
 
-    <div class="container"></div>
+    <div class="container"><div class="ad-placeholder ad-banner" id="ad-banner-top">📢 Espaço para anúncio</div></div>
 
     
   <!-- Slot: banner-topo -->
@@ -208,11 +208,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
     <div class="container">
-      
+      <div class="ad-placeholder ad-banner">📢 Espaço para anúncio</div>
       <div class="article-layout">
         <div class="article-content" id="article-content"></div>
         <aside class="article-sidebar">
-          
+          <div class="ad-placeholder ad-square">📢 Anúncio 300×250</div>
           <div class="sidebar-box" style="margin-top:20px;"><h4>📚 Artigos relacionados</h4><ul id="related-articles"></ul></div>
           <div class="cta-box"><h4>Ficou com dúvidas?</h4><p>Para seu caso específico, consulte um especialista.</p><a href="#" class="btn-cta-white" href="/contato" onclick="showPage('contact');return false;">Fale conosco</a></div>
         </aside>
