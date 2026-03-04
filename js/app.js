@@ -116,8 +116,44 @@ function scrollToSection(id) {
 
 // DADOS PÚBLICOS
 async function loadPublicData() {
-  await Promise.all([loadCategories(), loadPublicArticles()])
+  await Promise.all([loadCategories(), loadPublicArticles(), loadPublicAds()])
 }
+// ============================================
+// ANÚNCIOS PÚBLICOS
+// ============================================
+async function loadPublicAds() {
+  try {
+    const { data } = await sb.from('ads')
+      .select('*')
+      .eq('status', 'active')
+    if (!data || data.length === 0) return
+    data.forEach(ad => renderAdInSlot(ad))
+  } catch(e) {}
+}
+
+function renderAdInSlot(ad) {
+  const slots = document.querySelectorAll(`[data-ad-slot="${ad.position}"]`)
+  if (!slots.length) return
+  const html = buildAdHtml(ad)
+  slots.forEach(slot => {
+    slot.innerHTML = html
+    slot.style.display = 'block'
+  })
+}
+
+function buildAdHtml(ad) {
+  if (ad.type === 'code') {
+    return `<div class="ad-slot-inner">${ad.html_code}</div>`
+  }
+  const img = ad.image_base64 || ad.image_url
+  if (!img) return ''
+  const inner = `<img src="${img}" alt="${ad.alt_text || ad.name || 'Anúncio'}" style="width:100%;height:auto;display:block;border-radius:8px;">`
+  return ad.link
+    ? `<a href="${ad.link}" target="_blank" rel="noopener sponsored" class="ad-slot-inner">${inner}</a>`
+    : `<div class="ad-slot-inner">${inner}</div>`
+}
+
+
 
 async function loadCategories() {
   try {
