@@ -135,13 +135,12 @@ async function loadPublicAds() {
 
 function renderAdInSlot(ad) {
   const slots = document.querySelectorAll(`[data-ad-slot="${ad.position}"]`)
-  console.log(`Slot "${ad.position}": ${slots.length} encontrado(s)`)
   if (!slots.length) return
   const html = buildAdHtml(ad)
-  if (!html) { console.log('buildAdHtml retornou vazio para:', ad.ad_id); return }
+  if (!html) return
   slots.forEach(slot => {
     slot.innerHTML = html
-    slot.classList.add('ativo')
+    slot.style.cssText = 'display:block !important; visibility:visible !important; min-height:60px; width:100%;'
   })
 }
 
