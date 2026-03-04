@@ -3,60 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Diagnóstico Anúncios</title>
+  <title>Teste Anúncios</title>
   <style>
-    body { font-family: monospace; padding: 16px; background: #111; color: #0f0; font-size: 13px; }
-    .ok { color: #0f0; } .erro { color: #f44; } .info { color: #ff0; }
-    h2 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 8px; margin-top: 24px; }
+    body { font-family: sans-serif; padding: 16px; background: #f5f5f5; }
+    .slot { border: 2px dashed #ccc; padding: 16px; margin: 16px 0; min-height: 80px; background: #fff; border-radius: 8px; }
+    .slot.ativo { border-color: #2ecc71; }
+    h3 { color: #333; margin: 0 0 8px; font-size: 13px; color: #999; }
+    #log { background: #111; color: #0f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; margin-bottom: 16px; }
   </style>
 </head>
 <body>
-<h2>🔍 Diagnóstico Anúncios</h2>
-<div id="log"></div>
+
+<div id="log">Carregando...</div>
+
+<h2>Slot: banner-topo</h2>
+<div class="slot" data-ad-slot="banner-topo"><h3>vazio</h3></div>
+
+<h2>Slot: meio-artigo</h2>
+<div class="slot" data-ad-slot="meio-artigo"><h3>vazio</h3></div>
+
+<h2>Slot: rodape</h2>
+<div class="slot" data-ad-slot="rodape"><h3>vazio</h3></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
 <script>
 const log = document.getElementById('log')
-function out(msg, tipo='info') { log.innerHTML += `<div class="${tipo}">${msg}</div>` }
 
-async function diagnostico() {
-  // 1. Todos os anúncios
-  out('<h2>Todos os anúncios no banco</h2>')
-  const { data: todos, error: e1 } = await sb.from('ads').select('*')
-  if (e1) { out('❌ Erro: ' + e1.message, 'erro'); }
-  else if (!todos || todos.length === 0) { out('⚠️ Nenhum anúncio cadastrado ainda', 'erro') }
-  else {
-    out(`✅ ${todos.length} anúncio(s) no banco`, 'ok')
-    todos.forEach(ad => {
-      out(`   📢 ID: ${ad.ad_id} | Status: ${ad.status} | Posição: ${ad.position} | Tipo: ${ad.type}`, 
-          ad.status === 'active' ? 'ok' : 'info')
-    })
+async function testar() {
+  log.innerHTML = 'Buscando anúncios...\n'
+
+  const { data, error } = await sb.from('ads').select('*').eq('status', 'active')
+
+  if (error) {
+    log.innerHTML += '❌ ERRO: ' + error.message
+    return
   }
 
-  // 2. Só ativos
-  out('<h2>Anúncios ativos (o que aparece no site)</h2>')
-  const { data: ativos, error: e2 } = await sb.from('ads').select('*').eq('status','active')
-  if (e2) { out('❌ Erro RLS: ' + e2.message, 'erro'); out('⚠️ Provavelmente falta policy de leitura pública na tabela ads', 'erro') }
-  else if (!ativos || ativos.length === 0) { out('⚠️ Nenhum anúncio com status "active"', 'erro') }
-  else {
-    out(`✅ ${ativos.length} anúncio(s) ativo(s)`, 'ok')
-    ativos.forEach(ad => {
-      const temConteudo = ad.image_base64 || ad.image_url || ad.html_code
-      out(`   ✅ ${ad.ad_id} → posição: ${ad.position} | tem conteúdo: ${temConteudo ? 'SIM' : 'NÃO'}`,
-          temConteudo ? 'ok' : 'erro')
+  log.innerHTML += `✅ ${data.length} anúncio(s) encontrado(s)\n`
+
+  data.forEach(ad => {
+    log.innerHTML += `\n📢 ${ad.ad_id} → posição: ${ad.position}\n`
+
+    const slots = document.querySelectorAll(`[data-ad-slot="${ad.position}"]`)
+    log.innerHTML += `   Slots no DOM: ${slots.length}\n`
+
+    const img = ad.image_base64 || ad.image_url
+    const html = ad.type === 'code'
+      ? ad.html_code
+      : img
+        ? `<a href="${ad.link||'#'}" target="_blank"><img src="${img}" style="width:100%;height:auto;display:block;border-radius:8px;" onerror="this.src='';this.alt='Erro ao carregar imagem'"></a>`
+        : null
+
+    if (!html) {
+      log.innerHTML += `   ⚠️ Sem conteúdo (sem imagem e sem código HTML)\n`
+      return
+    }
+
+    slots.forEach(slot => {
+      slot.innerHTML = html
+      slot.classList.add('ativo')
     })
-  }
 
-  // 3. Slots no DOM (não existe neste arquivo de teste, mas informa)
-  out('<h2>Slots no site</h2>')
-  out('Slots esperados: banner-topo, meio-artigo, rodape', 'info')
-  out('Para ver se aparecem, acesse a home e verifique após o deploy', 'info')
-
-  out('<br><div class="ok">✅ Diagnóstico concluído</div>')
+    log.innerHTML += `   ✅ Renderizado!\n`
+  })
 }
 
-diagnostico()
+testar()
 </script>
 </body>
 </html>
