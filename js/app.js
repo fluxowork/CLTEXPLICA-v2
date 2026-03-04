@@ -141,9 +141,7 @@ function renderAdInSlot(ad) {
   if (!html) { console.log('buildAdHtml retornou vazio para:', ad.ad_id); return }
   slots.forEach(slot => {
     slot.innerHTML = html
-    slot.style.display = 'block'
-    slot.style.visibility = 'visible'
-    slot.style.minHeight = '60px'
+    slot.classList.add('ativo')
   })
 }
 
