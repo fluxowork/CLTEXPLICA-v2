@@ -131,6 +131,38 @@ async function filterByCategory(category) {
   setTimeout(() => scrollToSection('artigos'), 150)
 }
 
+
+// ── MARKDOWN PARSER ──
+function parseMarkdown(text) {
+  if (!text) return ''
+  return text
+    // Títulos
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Negrito e itálico
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Listas
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Agrupar <li> em <ul>
+    .replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
+    // Tabelas simples
+    .replace(/\|(.+)\|/g, (match) => {
+      const cells = match.split('|').filter(c => c.trim())
+      return '<tr>' + cells.map(c => '<td>' + c.trim() + '</td>').join('') + '</tr>'
+    })
+    .replace(/(<tr>.*<\/tr>\n?)+/g, m => '<table>' + m + '</table>')
+    // Remover linhas de separador de tabela
+    .replace(/<tr><td>[-| ]+<\/td><\/tr>/g, '')
+    // Parágrafos (linhas que não são tags HTML)
+    .replace(/^(?!<[hultbp]).+$/gm, p => p.trim() ? '<p>' + p + '</p>' : '')
+    // Quebras de linha duplas extras
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 async function openArticle(slug) {
   try {
     const { data } = await sb.from('posts')
@@ -143,7 +175,7 @@ async function openArticle(slug) {
     document.getElementById('article-title').textContent = data.title
     document.getElementById('article-date').textContent = '📅 ' + formatDate(data.published_at)
     document.getElementById('article-read-time').textContent = '⏱️ ~' + readTime(data.content) + ' min de leitura'
-    document.getElementById('article-content').innerHTML = data.content || ''
+    document.getElementById('article-content').innerHTML = parseMarkdown(data.content || '')
     loadRelatedArticles(data.category, data.id)
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'))
     document.getElementById('article-page').classList.add('active')
